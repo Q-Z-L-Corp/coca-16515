@@ -1,0 +1,5 @@
+{
+  "name": "COCA 16515 Master",
+  "description": "A gamified English vocabulary learning application leveraging the top 16,515 COCA words and Gemini 3 AI for personalized tutoring, context generation, and smart quizzes.",
+  "requestFramePermissions": []
+}
