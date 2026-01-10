@@ -8,25 +8,18 @@ import QuizMode from "./components/QuizMode";
 import ChatTutor from "./components/ChatTutor";
 import BrowserMode from "./components/BrowserMode";
 import { AppMode } from "../types";
-import { useUserStats } from "./hooks/useUserStats";
+import { useUserStats } from "./UserStatsProvider";
 
 const App: React.FC = () => {
 	const [mode, setMode] = useState<AppMode>(AppMode.DASHBOARD);
-	const { stats, addXp, addWordsLearned } = useUserStats();
+	const { stats, addXp } = useUserStats();
 
 	const renderContent = () => {
 		switch (mode) {
 			case AppMode.DASHBOARD:
 				return <Dashboard stats={stats} setMode={setMode} />;
 			case AppMode.LEARN:
-				return (
-					<FlashcardMode
-						onRoundComplete={(words) => {
-							addXp(50); // 50 XP for finishing a round
-							addWordsLearned(words);
-						}}
-					/>
-				);
+				return <FlashcardMode stats={stats} />;
 			case AppMode.BROWSER:
 				return <BrowserMode />;
 			case AppMode.QUIZ:

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Play, Sparkles, Trophy } from "lucide-react";
 import WordCard from "./WordCard";
-import { useUserStats } from "../hooks/useUserStats";
-import { CocaWord } from "@/types";
+import { CocaWord, UserStats } from "@/types";
 import { COCA } from "../coca";
 
 const WORDS_PER_ROUND = 20;
 
 interface FlashcardModeProps {
-	onRoundComplete?: (count: number) => void;
+	stats: UserStats;
 }
 
 interface FlashcardWord extends CocaWord {
@@ -16,9 +15,7 @@ interface FlashcardWord extends CocaWord {
 	reason?: string;
 }
 
-const FlashcardMode: React.FC<FlashcardModeProps> = ({ onRoundComplete }) => {
-	const { stats } = useUserStats();
-
+const FlashcardMode: React.FC<FlashcardModeProps> = ({ stats }) => {
 	const [words, setWords] = useState<FlashcardWord[]>([]);
 	const [currentIndex, setCurrentIndex] = useState<number>(0);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -26,7 +23,6 @@ const FlashcardMode: React.FC<FlashcardModeProps> = ({ onRoundComplete }) => {
 
 	// Fetch 20 words from API
 	const fetchWords = async () => {
-		if (!stats) return;
 		setLoading(true);
 		setRoundFinished(false);
 		setCurrentIndex(0);
@@ -63,14 +59,13 @@ const FlashcardMode: React.FC<FlashcardModeProps> = ({ onRoundComplete }) => {
 
 	useEffect(() => {
 		fetchWords();
-	}, [stats]);
+	}, []);
 
 	const handleNext = () => {
 		if (currentIndex < words.length - 1) {
 			setCurrentIndex((i) => i + 1);
 		} else {
 			setRoundFinished(true);
-			onRoundComplete?.(WORDS_PER_ROUND);
 		}
 	};
 
@@ -122,7 +117,7 @@ const FlashcardMode: React.FC<FlashcardModeProps> = ({ onRoundComplete }) => {
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] px-4">
-			<WordCard item={currentWord} className="w-full max-w-md h-[380px]" />
+			<WordCard item={currentWord} className="w-full max-w-md h-[480px]" />
 
 			<div className="flex justify-between items-center mt-6 max-w-md w-full gap-4">
 				<button

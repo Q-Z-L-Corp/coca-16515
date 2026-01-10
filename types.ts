@@ -22,7 +22,7 @@ export enum AppMode {
 }
 
 export interface UserStats {
-	wordsLearned: number;
+	wordsLearned: string[];
 	xp: number;
 	streak: number;
 	level: number;

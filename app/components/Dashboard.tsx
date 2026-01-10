@@ -57,14 +57,14 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, setMode }) => {
 				</div>
 				<div className="hidden md:block text-right">
 					<p className="text-sm text-slate-400 font-medium">Current Goal</p>
-					<p className="text-lg font-bold text-indigo-600">Top 5000 Words</p>
+					<p className="text-lg font-bold text-indigo-600">Top 16515 Words</p>
 				</div>
 			</div>
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 				<StatCard
 					title="Words Learned"
-					value={stats.wordsLearned}
+					value={stats.wordsLearned.length}
 					icon={Brain}
 					colorClass="text-violet-600"
 					bgClass="bg-violet-100"
@@ -166,11 +166,13 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, setMode }) => {
 								Mastery Goal
 							</span>
 						</div>
-						<h3 className="text-3xl font-black mb-2">0.8%</h3>
+						<h3 className="text-3xl font-black mb-2">{`${((stats.wordsLearned.length / 16515) * 100).toFixed(3)}%`}</h3>
 						<p className="text-indigo-100 font-medium leading-relaxed">
 							You have mastered{" "}
-							<span className="font-bold text-white">142</span> out of 16,515
-							words.
+							<span className="font-bold text-white">
+								{stats.wordsLearned.length}
+							</span>{" "}
+							out of 16,515 words.
 						</p>
 					</div>
 
@@ -182,14 +184,18 @@ const Dashboard: React.FC<DashboardProps> = ({ stats, setMode }) => {
 						<div className="w-full bg-black/20 rounded-full h-3 mb-8 backdrop-blur-sm">
 							<div
 								className="bg-white h-3 rounded-full shadow-lg relative"
-								style={{ width: `${(stats.wordsLearned / 16515) * 100}%` }}
+								style={{
+									width: `${(stats.wordsLearned.length / 16515) * 100}%`,
+								}}
 							>
 								<div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md scale-125"></div>
 							</div>
 						</div>
 
 						<button
-							onClick={() => setMode(AppMode.LEARN)}
+							onClick={() => {
+								setMode(AppMode.LEARN);
+							}}
 							className="w-full py-4 bg-white text-indigo-700 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center justify-center group shadow-lg"
 						>
 							Continue Learning{" "}

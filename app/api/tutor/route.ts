@@ -7,7 +7,7 @@ import { fetchWordHtml } from "@/app/utils/contentProvider";
 import { parseCocaHtml } from "@/app/utils/cocaParser";
 
 const apiKey = process.env.GEMINI_API_KEY!;
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 10000 } });
 
 /* ----------------------- helpers ----------------------- */
 
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
 /* ----------------------- implementations ----------------------- */
 
-function getRankWindow(userStats: UserStats) {
+function getRankWindow(userStats: UserStats, wordsSeen?: string[]) {
 	const base = 300;
 	const levelInfluence = userStats.level * 50;
 	const xpInfluence = Math.min(userStats.xp / 10, 500); // cap it
@@ -129,7 +129,7 @@ function getRankWindow(userStats: UserStats) {
 	let start = base + levelInfluence + xpInfluence + streakInfluence;
 	start += Math.floor(Math.random() * 50); // randomize a little
 
-	let windowSize = 800;
+	let windowSize = 50;
 	let end = start + windowSize;
 
 	// ensure we don't exceed COCA length
@@ -148,7 +148,7 @@ async function handleFlashcards(
 	wordsSeen?: string[],
 ): Promise<any> {
 	try {
-		const { start, end } = getRankWindow(userStats);
+		const { start, end } = getRankWindow(userStats, wordsSeen);
 
 		const candidates = COCA.filter((w) => !wordsSeen?.includes(w.word))
 			.slice(start, end)
@@ -199,15 +199,26 @@ Return JSON only:
 			},
 			required: ["words"],
 		};
-
-		const response = await ai.models.generateContent({
-			model: GEMINI_MODEL_FAST,
-			contents: prompt,
-			config: {
-				responseMimeType: "application/json",
-				responseSchema,
-			},
-		});
+		let response;
+		try {
+			response = await ai.models.generateContent({
+				model: GEMINI_MODEL_SMART,
+				contents: prompt,
+				config: {
+					responseMimeType: "application/json",
+					responseSchema,
+				},
+			});
+		} catch (error) {
+			response = await ai.models.generateContent({
+				model: GEMINI_MODEL_FAST,
+				contents: prompt,
+				config: {
+					responseMimeType: "application/json",
+					responseSchema,
+				},
+			});
+		}
 		return JSON.parse(response.text || "{}");
 	} catch (error) {
 		console.error("Gemini Flashcards Error:", error);
@@ -266,17 +277,30 @@ ${
 
 Respond strictly in the requested JSON format.`;
 
-	const response = await ai.models.generateContent({
-		model: GEMINI_MODEL_FAST,
-		contents: prompt,
-		config: {
-			responseMimeType: "application/json",
-			responseSchema,
-		},
-	});
+	let response;
+	try {
+		response = await ai.models.generateContent({
+			model: GEMINI_MODEL_SMART,
+			contents: prompt,
+			config: {
+				responseMimeType: "application/json",
+				responseSchema,
+			},
+		});
+	} catch (error) {
+		response = await ai.models.generateContent({
+			model: GEMINI_MODEL_FAST,
+			contents: prompt,
+			config: {
+				responseMimeType: "application/json",
+				responseSchema,
+			},
+		});
+	}
 
 	return JSON.parse(response.text || "{}");
 }
+
 async function handleQuiz(word: string): Promise<QuizQuestion | null> {
 	let contextInfo = "";
 	const item = getCocaMap().get(word.toLowerCase());
@@ -321,14 +345,26 @@ ${
 - Do not include the correct answer in the question stem.
 - Respond strictly in JSON.`;
 
-	const response = await ai.models.generateContent({
-		model: GEMINI_MODEL_FAST,
-		contents: prompt,
-		config: {
-			responseMimeType: "application/json",
-			responseSchema,
-		},
-	});
+	let response;
+	try {
+		response = await ai.models.generateContent({
+			model: GEMINI_MODEL_SMART,
+			contents: prompt,
+			config: {
+				responseMimeType: "application/json",
+				responseSchema,
+			},
+		});
+	} catch (error) {
+		response = await ai.models.generateContent({
+			model: GEMINI_MODEL_FAST,
+			contents: prompt,
+			config: {
+				responseMimeType: "application/json",
+				responseSchema,
+			},
+		});
+	}
 
 	return JSON.parse(response.text || "{}");
 }
@@ -342,18 +378,34 @@ async function handleChat(
 		? `${contextBlock}\n\nUser Message: ${message}`
 		: message;
 
-	const chat = ai.chats.create({
-		model: GEMINI_MODEL_SMART,
-		history,
-		config: {
-			systemInstruction:
-				"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
-		},
-	});
+	let result;
+	try {
+		const chat = ai.chats.create({
+			model: GEMINI_MODEL_SMART,
+			history,
+			config: {
+				systemInstruction:
+					"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
+			},
+		});
 
-	const result = await chat.sendMessage({
-		message: augmentedMessage,
-	});
+		result = await chat.sendMessage({
+			message: augmentedMessage,
+		});
+	} catch (error) {
+		const chat = ai.chats.create({
+			model: GEMINI_MODEL_FAST,
+			history,
+			config: {
+				systemInstruction:
+					"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
+			},
+		});
+
+		result = await chat.sendMessage({
+			message: augmentedMessage,
+		});
+	}
 
 	return { reply: result.text };
 }

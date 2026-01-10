@@ -3,6 +3,7 @@ import { CocaWord } from "@/types";
 import { parseCocaHtml, ParsedWordData } from "../utils/cocaParser";
 import { fetchWordHtml } from "../utils/contentProvider";
 import { Volume2, RotateCw, Sparkles, Book, Info } from "lucide-react";
+import { useUserStats } from "../UserStatsProvider";
 
 interface WordCardProps {
 	item: CocaWord;
@@ -20,6 +21,7 @@ const WordCard: React.FC<WordCardProps> = ({
 	const [wordData, setWordData] = useState<ParsedWordData | null>(null);
 	const [audioError, setAudioError] = useState(false);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
+	const { addXp, addWordsLearned } = useUserStats();
 
 	const loadWordData = async () => {
 		if (!item) return;
@@ -68,9 +70,20 @@ const WordCard: React.FC<WordCardProps> = ({
 		window.speechSynthesis.speak(utterance);
 	};
 
+	const onFlipEffect = () => {
+		setIsFlipped(!isFlipped);
+		if (isFlipped) {
+			addWordsLearned([item.word]);
+			addXp(5); // Award 5 XP for learning the word after flipping back
+		}
+		if (!isFlipped) {
+			addXp(5); // Award 5 XP for flipping the card to see details
+		}
+	};
+
 	return (
 		<div
-			onClick={() => setIsFlipped(!isFlipped)}
+			onClick={onFlipEffect}
 			className={`relative perspective-1000 cursor-pointer group ${className}`}
 		>
 			<audio ref={audioRef} className="hidden" />

@@ -17,7 +17,7 @@ const getInitialHistory = () => {
 };
 
 export const INITIAL_STATS: UserStats = {
-	wordsLearned: 0,
+	wordsLearned: [],
 	xp: 0,
 	streak: 1,
 	level: 1,
@@ -25,5 +25,5 @@ export const INITIAL_STATS: UserStats = {
 	lastLogin: new Date().toDateString(),
 };
 
-export const GEMINI_MODEL_FAST = "gemini-3-flash-preview";
+export const GEMINI_MODEL_FAST = "gemini-2.5-flash";
 export const GEMINI_MODEL_SMART = "gemini-3-flash-preview";
