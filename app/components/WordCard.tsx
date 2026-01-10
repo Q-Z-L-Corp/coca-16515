@@ -36,7 +36,7 @@ const WordCard: React.FC<WordCardProps> = ({
 				audioSrc: null,
 				phonetic: "",
 				definition: "Definition unavailable.",
-				examples: [],
+				usageBlocks: [],
 			});
 		} finally {
 			setLoading(false);
@@ -156,21 +156,44 @@ const WordCard: React.FC<WordCardProps> = ({
 									</p>
 								</div>
 
-								{wordData.examples && wordData.examples.length > 0 && (
+								{wordData.usageBlocks && wordData.usageBlocks.length > 0 && (
 									<div>
 										<h4 className="flex items-center text-indigo-500 text-[10px] uppercase tracking-wider font-extrabold mb-3 pl-1">
 											<Book size={12} className="mr-1.5" /> Examples
 										</h4>
-										<ul className="space-y-3">
-											{wordData.examples.slice(0, 2).map((ex, i) => (
-												<li
-													key={i}
-													className="text-slate-600 text-xs md:text-sm bg-indigo-50/50 p-3 rounded-xl border-l-4 border-indigo-400 italic leading-relaxed"
-												>
-													"{ex}"
-												</li>
+
+										<div className="space-y-6">
+											{wordData.usageBlocks.map((block, blockIndex) => (
+												<div key={blockIndex} className="space-y-3">
+													{/* POS */}
+													<div className="text-[10px] font-extrabold tracking-wide text-rose-500 uppercase">
+														{block.pos}
+													</div>
+
+													{/* Usage (ZH) */}
+													<div className="text-xs text-orange-600">
+														{block.usageZh}
+													</div>
+
+													{/* Usage (EN) */}
+													<div className="text-xs font-semibold text-slate-700">
+														{block.usageEn}
+													</div>
+
+													{/* Examples */}
+													<ul className="space-y-2 pt-1">
+														{block.examples.slice(0, 2).map((ex, i) => (
+															<li
+																key={i}
+																className="text-slate-600 text-xs md:text-sm bg-indigo-50/50 p-3 rounded-xl border-l-4 border-indigo-400 italic leading-relaxed"
+															>
+																“{ex}”
+															</li>
+														))}
+													</ul>
+												</div>
 											))}
-										</ul>
+										</div>
 									</div>
 								)}
 							</div>

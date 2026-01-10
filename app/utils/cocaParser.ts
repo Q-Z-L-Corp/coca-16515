@@ -1,9 +1,16 @@
+export interface UsageBlock {
+	pos: string; // DET
+	usageZh: string; // 中文说明
+	usageEn: string; // English explanation
+	examples: string[]; // examples
+}
+
 export interface ParsedWordData {
 	word: string;
 	audioSrc: string | null;
 	phonetic: string;
 	definition: string;
-	examples: string[];
+	usageBlocks: UsageBlock[];
 }
 
 export const parseCocaHtml = (
@@ -25,48 +32,81 @@ export const parseCocaHtml = (
 	const allDivs = Array.from(doc.querySelectorAll("div")).map(
 		(d) => d.textContent || "",
 	);
-	let phonetic = "";
-	let definition = "";
 
-	for (const text of allDivs) {
-		const trimmed = text.trim();
-		// Heuristic for phonetic: usually contains brackets like [bi]
-		if (trimmed.includes("[") && trimmed.includes("]")) {
-			phonetic = trimmed;
-		}
-		// Heuristic for definition: contains Chinese or part of speech markers, not examples
-		else if (
-			(trimmed.match(/^[a-z]+\./) || /[\u4e00-\u9fa5]/.test(trimmed)) &&
-			!trimmed.startsWith("例")
-		) {
-			// Ensure we capture the first substantial definition block
-			if (!definition || definition.length < trimmed.length) {
-				definition = trimmed;
-			}
-		}
-	}
+	const phonetic = allDivs[0].trim();
+
+	const definition = allDivs[1].trim();
 
 	// 3. Examples Extraction
-	// Examples are often inside a quoted string containing HTML: "<div>...</div>"
-	// We use regex to grab the quoted HTML string part.
-	const examples: string[] = [];
-	const exampleMatch = html.match(/"(<div.*<\/div>)"/s);
-
-	if (exampleMatch && exampleMatch[1]) {
-		const exDoc = parser.parseFromString(exampleMatch[1], "text/html");
-		exDoc.querySelectorAll("div").forEach((div) => {
-			let text = div.textContent || "";
-			// Clean up common prefixes like "例："
-			text = text.replace(/^(例|Example)[:：]?/, "").trim();
-			if (text) examples.push(text);
-		});
-	}
+	const usageBlocks = parseExamples(doc);
 
 	return {
 		word: originalWord,
 		audioSrc,
 		phonetic,
 		definition: definition || "No definition available locally.",
-		examples,
+		usageBlocks,
 	};
 };
+
+function parseExamples(doc: Document): UsageBlock[] {
+	const blocks: UsageBlock[] = [];
+
+	const divs = Array.from(doc.querySelectorAll("div"));
+
+	let i = 0;
+
+	while (i < divs.length) {
+		const div = divs[i];
+
+		console.log("Processing div:", div.style.color, div.textContent);
+
+		// 1️⃣ Detect section start
+		if (div.style.color === "rosybrown") {
+			const pos = (div.textContent || "").trim();
+
+			// 2️⃣ Next div: Chinese usage
+			const usageZhDiv = divs[++i];
+			const usageZh = (usageZhDiv?.textContent || "").trim();
+
+			// 3️⃣ Next div: English usage
+			const usageEnDiv = divs[++i];
+			const usageEn = (usageEnDiv?.textContent || "").trim();
+
+			// 4️⃣ Collect examples until <div><br /></div>
+			const examples: string[] = [];
+
+			i++;
+			while (i < divs.length) {
+				const current = divs[i];
+
+				// End of this block
+				if (
+					current.innerHTML.trim() === "<br>" ||
+					current.innerHTML.trim() === "<br />"
+				) {
+					break;
+				}
+
+				let text = (current.textContent || "").trim();
+				text = text.replace(/^(例|Example)[:：]?\s*/, "");
+
+				if (text) {
+					examples.push(text);
+				}
+
+				i++;
+			}
+
+			blocks.push({
+				pos,
+				usageZh,
+				usageEn,
+				examples,
+			});
+		}
+
+		i++;
+	}
+	return blocks;
+}

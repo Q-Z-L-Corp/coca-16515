@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { parseCocaHtml } from "../utils/cocaParser";
+import { parseCocaHtml, UsageBlock } from "../utils/cocaParser";
 import { fetchWordHtml, isWordAvailable } from "../utils/contentProvider";
 import { CheckCircle, XCircle, AlertCircle, Loader2 } from "lucide-react";
 import { COCA } from "../coca";
@@ -13,7 +13,7 @@ interface LocalQuizQuestion {
 	targetWord: string;
 	definition: string;
 	options: string[];
-	examples: string[];
+	usageBlocks: UsageBlock[];
 }
 
 interface QuizModeProps {
@@ -64,17 +64,12 @@ const QuizMode: React.FC<QuizModeProps> = ({ onCorrectAnswer }) => {
 			setQuestion({
 				targetWord: targetItem.word,
 				definition: parsed.definition,
-				examples: parsed.examples,
+				usageBlocks: parsed.usageBlocks,
 				options,
 			});
 		} catch (error) {
 			console.error("Quiz generation error", error);
-			setQuestion({
-				targetWord: "be",
-				definition: "v. to exist; to take place",
-				examples: ["To be or not to be."],
-				options: ["be", "have", "go", "do"],
-			});
+			setQuestion(null);
 		} finally {
 			setLoading(false);
 		}
@@ -189,11 +184,16 @@ const QuizMode: React.FC<QuizModeProps> = ({ onCorrectAnswer }) => {
 						</h4>
 						<div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-xl mb-6">
 							<ul className="list-disc list-inside space-y-2 text-indigo-800 text-sm font-medium">
-								{question.examples.length > 0 ? (
-									question.examples.slice(0, 2).map((ex, i) => (
-										<li key={i} className="italic">
-											"{ex}"
-										</li>
+								{question.usageBlocks.length > 0 ? (
+									question.usageBlocks.map((ex, i) => (
+										<>
+											<li key={i + "zh"} className="italic">
+												"{ex.usageZh}"
+											</li>
+											<li key={i + "en"} className="italic">
+												"{ex.usageEn}"
+											</li>
+										</>
 									))
 								) : (
 									<li>No examples available for this word.</li>
