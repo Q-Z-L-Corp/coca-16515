@@ -1,5 +1,5 @@
 import React from "react";
-import { UserStats } from "@/types";
+import { AppMode, UserStats } from "@/types";
 import {
 	BarChart,
 	Bar,
@@ -20,6 +20,7 @@ import {
 
 interface DashboardProps {
 	stats: UserStats;
+	setMode: (mode: AppMode) => void;
 }
 
 const StatCard: React.FC<{
@@ -42,7 +43,7 @@ const StatCard: React.FC<{
 	</div>
 );
 
-const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
+const Dashboard: React.FC<DashboardProps> = ({ stats, setMode }) => {
 	return (
 		<div className="space-y-8 animate-fade-in pb-20">
 			<div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
@@ -187,7 +188,10 @@ const Dashboard: React.FC<DashboardProps> = ({ stats }) => {
 							</div>
 						</div>
 
-						<button className="w-full py-4 bg-white text-indigo-700 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center justify-center group shadow-lg">
+						<button
+							onClick={() => setMode(AppMode.LEARN)}
+							className="w-full py-4 bg-white text-indigo-700 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center justify-center group shadow-lg"
+						>
 							Continue Learning{" "}
 							<ArrowRight
 								size={18}

@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { getTutorResponse } from "../services/geminiService";
 import { Send, Bot, User } from "lucide-react";
 import { ChatMessage } from "@/types";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const ChatTutor: React.FC = () => {
 	const [input, setInput] = useState("");
@@ -88,9 +90,11 @@ const ChatTutor: React.FC = () => {
 								{msg.role === "user" ? <User size={12} /> : <Bot size={12} />}
 								<span>{msg.role === "model" ? "Tutor" : "You"}</span>
 							</div>
-							<p className="whitespace-pre-wrap leading-relaxed text-sm md:text-base font-medium">
-								{msg.text}
-							</p>
+							<div className="prose prose-sm md:prose-base max-w-none prose-slate">
+								<ReactMarkdown remarkPlugins={[remarkGfm]}>
+									{msg.text}
+								</ReactMarkdown>
+							</div>
 						</div>
 					</div>
 				))}

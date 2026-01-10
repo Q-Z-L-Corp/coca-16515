@@ -17,7 +17,7 @@ const App: React.FC = () => {
 	const renderContent = () => {
 		switch (mode) {
 			case AppMode.DASHBOARD:
-				return <Dashboard stats={stats} />;
+				return <Dashboard stats={stats} setMode={setMode} />;
 			case AppMode.LEARN:
 				return (
 					<FlashcardMode
@@ -34,7 +34,7 @@ const App: React.FC = () => {
 			case AppMode.TUTOR:
 				return <ChatTutor />;
 			default:
-				return <Dashboard stats={stats} />;
+				return <Dashboard stats={stats} setMode={setMode} />;
 		}
 	};
 

@@ -1,11 +1,5 @@
 import { CocaWord, UserStats } from "../types";
 
-// In a real scenario, this would be fetched from the large json file.
-export const MOCK_COCA_DATA: CocaWord[] = [
-	{ word: "the", html: "coca_00001_the.html", rank: 1 },
-	// ... (kept for fallback structure if needed, though main data is in data/coca.ts)
-];
-
 // Generate last 7 days for the chart
 const getInitialHistory = () => {
 	const history = [];
@@ -32,4 +26,4 @@ export const INITIAL_STATS: UserStats = {
 };
 
 export const GEMINI_MODEL_FAST = "gemini-3-flash-preview";
-export const GEMINI_MODEL_SMART = "gemini-3-pro-preview";
+export const GEMINI_MODEL_SMART = "gemini-3-flash-preview";

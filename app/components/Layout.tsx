@@ -29,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ currentMode, setMode, children }) => {
 			<aside className="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 p-6 sticky top-0 h-screen shadow-sm z-10">
 				<div className="mb-10 px-2">
 					<h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight">
-						COCA 16k
+						COCA 16515
 					</h1>
 					<p className="text-xs text-slate-400 font-medium tracking-wide uppercase mt-1">
 						Vocabulary Master

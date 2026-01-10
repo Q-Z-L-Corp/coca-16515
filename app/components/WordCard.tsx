@@ -103,6 +103,11 @@ const WordCard: React.FC<WordCardProps> = ({
 						) : (
 							<div className="h-8"></div>
 						)}
+						{item?.reason && (
+							<div className="text-xs italic text-slate-400 mt-2 text-center">
+								{item.reason}
+							</div>
+						)}
 					</div>
 
 					<div className="flex-1 flex flex-col justify-end items-center w-full space-y-4">

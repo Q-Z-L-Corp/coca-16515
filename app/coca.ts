@@ -1,7 +1,6 @@
 import { CocaWord } from "@/types";
 
 export const COCA: CocaWord[] = [
-	{ word: "", html: "" },
 	{ word: "the", html: "coca_00001_the.html" },
 	{ word: "be", html: "coca_00002_be.html" },
 	{ word: "and", html: "coca_00003_and.html" },

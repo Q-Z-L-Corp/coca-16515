@@ -61,3 +61,26 @@ body {
 		transform: translateY(0);
 	}
 }
+
+@keyframes dots {
+	0%,
+	20% {
+		content: "";
+	}
+	40% {
+		content: ".";
+	}
+	60% {
+		content: "..";
+	}
+	80%,
+	100% {
+		content: "...";
+	}
+}
+
+.animate-dots::after {
+	content: "";
+	display: inline-block;
+	animation: dots 1s infinite steps(4, end);
+}

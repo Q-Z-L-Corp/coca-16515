@@ -201,7 +201,7 @@ const BrowserMode: React.FC = () => {
 			<div
 				className={`
         w-full transition-all duration-500 ease-in-out
-        ${isBrowsing ? "grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-5 auto-rows-min" : "flex flex-col gap-6"}
+        ${isBrowsing ? "grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-5" : "flex flex-col gap-6"}
       `}
 			>
 				{/* 

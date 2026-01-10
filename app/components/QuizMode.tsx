@@ -186,14 +186,14 @@ const QuizMode: React.FC<QuizModeProps> = ({ onCorrectAnswer }) => {
 							<ul className="list-disc list-inside space-y-2 text-indigo-800 text-sm font-medium">
 								{question.usageBlocks.length > 0 ? (
 									question.usageBlocks.map((ex, i) => (
-										<>
+										<div key={i}>
 											<li key={i + "zh"} className="italic">
 												"{ex.usageZh}"
 											</li>
 											<li key={i + "en"} className="italic">
 												"{ex.usageEn}"
 											</li>
-										</>
+										</div>
 									))
 								) : (
 									<li>No examples available for this word.</li>
