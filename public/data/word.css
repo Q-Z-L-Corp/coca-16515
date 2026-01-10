@@ -1,0 +1,35 @@
+pre {
+	font-size: 5.5em;
+}
+.audio {
+	display: inline-block;
+	width: 52px;
+	height: 52px;
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+	vertical-align: middle;
+	background: url(audio.png) no-repeat -104px 0 / auto 100%;
+}
+
+.audio-playing {
+	display: inline-block;
+	width: 52px;
+	height: 52px;
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+	vertical-align: middle;
+	background: url(audio.png) no-repeat -52px 0 / auto 100%;
+}
+
+.audio-light {
+	display: inline-block;
+	width: 52px;
+	height: 52px;
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+	vertical-align: middle;
+	background: url(audio.png) no-repeat 0px 0 / auto 100%;
+}
