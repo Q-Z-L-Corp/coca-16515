@@ -373,39 +373,44 @@ async function handleChat(
 	history: { role: string; parts: { text: string }[] }[],
 	message: string,
 ) {
-	const contextBlock = await getRelevantContext(message);
-	const augmentedMessage = contextBlock
-		? `${contextBlock}\n\nUser Message: ${message}`
-		: message;
-
-	let result;
 	try {
-		const chat = ai.chats.create({
-			model: GEMINI_MODEL_SMART,
-			history,
-			config: {
-				systemInstruction:
-					"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
-			},
-		});
+		const contextBlock = await getRelevantContext(message);
+		const augmentedMessage = contextBlock
+			? `${contextBlock}\n\nUser Message: ${message}`
+			: message;
 
-		result = await chat.sendMessage({
-			message: augmentedMessage,
-		});
+		let result;
+		try {
+			const chat = ai.chats.create({
+				model: GEMINI_MODEL_SMART,
+				history,
+				config: {
+					systemInstruction:
+						"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
+				},
+			});
+
+			result = await chat.sendMessage({
+				message: augmentedMessage,
+			});
+		} catch (error) {
+			const chat = ai.chats.create({
+				model: GEMINI_MODEL_FAST,
+				history,
+				config: {
+					systemInstruction:
+						"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
+				},
+			});
+
+			result = await chat.sendMessage({
+				message: augmentedMessage,
+			});
+		}
+
+		return { reply: result.text };
 	} catch (error) {
-		const chat = ai.chats.create({
-			model: GEMINI_MODEL_FAST,
-			history,
-			config: {
-				systemInstruction:
-					"You are a helpful, encouraging English tutor for IELTS/TOEFL. Always prioritize [GROUNDING DATA] if present.",
-			},
-		});
-
-		result = await chat.sendMessage({
-			message: augmentedMessage,
-		});
+		console.error("Gemini Chat Error:", error);
+		return { reply: "Sorry, I encountered an error processing your request." };
 	}
-
-	return { reply: result.text };
 }

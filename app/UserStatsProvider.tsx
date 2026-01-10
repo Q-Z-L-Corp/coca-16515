@@ -19,7 +19,14 @@ export const UserStatsProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	useEffect(() => {
 		const stored = localStorage.getItem("coca_user_stats_v1");
-		if (stored) setStats(JSON.parse(stored));
+		if (stored) {
+			const storedStats: UserStats = JSON.parse(stored);
+			if (typeof storedStats.wordsLearned === "number") {
+				// Migrate old format
+				storedStats.wordsLearned = [];
+			}
+			setStats(storedStats);
+		}
 	}, []);
 
 	useEffect(() => {
